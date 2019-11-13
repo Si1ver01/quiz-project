@@ -6,14 +6,20 @@ class Quiz extends Component {
   state = {
     quiz: [
       {
-        answers:[
-          {text:'Вопрос 1'},
-          {text:'Вопрос 2'},
-          {text:'Вопрос 3'},
-          {text:'Вопрос 4'},
-        ]
+        answers: [
+          { text: "Very well" , id: 1},
+          { text: "So so" , id: 2 },
+          { text: "Nice" , id: 3 },
+          { text: "Very bad" , id: 4}
+        ],
+        question: "How do you like the weather?",
+        correctAnswerID : 2
       }
     ]
+  };
+
+  onAnswerClick = index => {
+    console.log(index);
   };
 
   render() {
@@ -21,7 +27,11 @@ class Quiz extends Component {
       <div className="quiz">
         <div className="quiz-wraper">
           <h1>Quiz</h1>
-          <Activequiz answers={this.state.quiz[0].answers}/>
+          <Activequiz
+            answers={this.state.quiz[0].answers}
+            question={this.state.quiz[0].question}
+            onAnswerClick={this.onAnswerClick}
+          />
         </div>
       </div>
     );
