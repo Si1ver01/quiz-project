@@ -1,0 +1,12 @@
+.answer-item{
+  border: 2px solid aliceblue;
+  border-radius: 5px;
+  padding: 5px 10px;
+  margin: 5px;
+  transition: .3s ease-in-out;
+
+}
+
+.answer-item:hover{
+  background: rgba(240, 248, 255, 0.281);
+}

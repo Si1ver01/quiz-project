@@ -1,24 +1,19 @@
-import React from 'react'
-import './activeQuiz.css'
+import React from "react";
+import "./activeQuiz.css";
+import AnswerList from "./answerList/answerList.jsx";
 
-const activeQuiz = () => {
-  return(
+const activeQuiz = props => {
+  return (
     <div className="active-quiz">
       <p className="question">
         <span>
-          <strong>1.</strong>&nbsp;
-          How do yoou like the weather ?
+          <strong>1.</strong>&nbsp; How do yoou like the weather ?
         </span>
         <small>1 from 12</small>
       </p>
-      <ul>
-        <li>1</li>
-        <li>2</li>
-        <li>3</li>
-        <li>4</li>
-      </ul>
+      <AnswerList answers={props.answers} />
     </div>
-  )
-}
+  );
+};
 
 export default activeQuiz;
