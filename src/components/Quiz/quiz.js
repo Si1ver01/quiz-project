@@ -1,11 +1,13 @@
 import React, { Component } from "react";
 import "./quiz.css";
 import Activequiz from "../activeQuiz/activeQuiz.js";
+import Finished from "../finished/finished.jsx";
 
 class Quiz extends Component {
   state = {
     currentQuiz: 0,
     answerState: null,
+    isFinished: true,
     quiz: [
       {
         answers: [
@@ -49,7 +51,7 @@ class Quiz extends Component {
 
       const timeout = window.setTimeout(() => {
         if (this.isQuizFinishid()) {
-          console.log("Finishid");
+          this.setState({ isFinished: true });
         } else {
           this.setState({
             currentQuiz: this.state.currentQuiz + 1,
@@ -72,15 +74,20 @@ class Quiz extends Component {
     return (
       <div className="quiz">
         <div className="quiz-wraper">
-          <h1>Quiz</h1>
-          <Activequiz
-            answers={this.state.quiz[this.state.currentQuiz].answers}
-            question={this.state.quiz[this.state.currentQuiz].question}
-            onAnswerClick={this.onAnswerClick}
-            quizLength={this.state.quiz.length}
-            currentQuiz={this.state.currentQuiz + 1}
-            answerState={this.state.answerState}
-          />
+          <h1>JS Test</h1>
+
+          {this.state.isFinished ? (
+            <Finished />
+          ) : (
+            <Activequiz
+              answers={this.state.quiz[this.state.currentQuiz].answers}
+              question={this.state.quiz[this.state.currentQuiz].question}
+              onAnswerClick={this.onAnswerClick}
+              quizLength={this.state.quiz.length}
+              currentQuiz={this.state.currentQuiz + 1}
+              answerState={this.state.answerState}
+            />
+          )}
         </div>
       </div>
     );
