@@ -5,9 +5,10 @@ import Finished from "../finished/finished.jsx";
 
 class Quiz extends Component {
   state = {
+    results: {},
     currentQuiz: 0,
     answerState: null,
-    isFinished: true,
+    isFinished: false,
     quiz: [
       {
         answers: [
@@ -43,8 +44,13 @@ class Quiz extends Component {
     }
 
     const question = this.state.quiz[this.state.currentQuiz];
+    const results = this.state.results;
 
     if (question.correctAnswerID === index) {
+      if (!results[question.id]) {
+        results[question.id] = "success";
+      }
+
       this.setState({
         answerState: { [index]: "success" }
       });
@@ -55,20 +61,33 @@ class Quiz extends Component {
         } else {
           this.setState({
             currentQuiz: this.state.currentQuiz + 1,
-            answerState: null
+            answerState: null,
+            results
           });
         }
 
         window.clearTimeout(timeout);
       }, 1000);
     } else {
+      results[question.id] = "error";
+
       this.setState({
-        answerState: { [index]: "error" }
+        answerState: { [index]: "error" },
+        results
       });
     }
   };
 
   isQuizFinishid = () => this.state.currentQuiz + 1 === this.state.quiz.length;
+
+  reloadQuestion = () => {
+    this.setState({
+      results: {},
+      currentQuiz: 0,
+      answerState: null,
+      isFinished: false
+    })
+  }
 
   render() {
     return (
@@ -77,7 +96,7 @@ class Quiz extends Component {
           <h1>JS Test</h1>
 
           {this.state.isFinished ? (
-            <Finished />
+            <Finished results={this.state.results} quiz={this.state.quiz} reload={this.reloadQuestion}/>
           ) : (
             <Activequiz
               answers={this.state.quiz[this.state.currentQuiz].answers}

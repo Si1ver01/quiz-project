@@ -1,27 +1,43 @@
-import React from 'react';
-import './finished.css'
+import React from "react";
+import "./finished.css";
 
-export default () => {
-
+export default props => {
+  const countSuccessAnswer = Object.keys(props.results).reduce((total, key) => {
+    if (props.results[key] === "success") {
+      total++;
+    }
+    return total;
+  }, 0);
 
   return (
     <div className="finished">
       <ul>
-        <li>
-          <strong>1. </strong>
-          How are you
-          <i className="fas fa-check ml-2 text-success"></i>
-        </li>
-        <li>
-          <strong>2. </strong>
-          How are you
-          <i className="fas fa-times ml-2 text-primary"></i>
-        </li>
+        {props.quiz.map((quizItem, index) => {
+          const clsForIcon = [
+            "fas",
+            props.results[quizItem.id] === "success"
+              ? "fa-check text-success"
+              : "fa-times text-primary",
+            "ml-2"
+          ];
+
+          return (
+            <li key={index}>
+              <strong>{quizItem.id}.</strong>&nbsp;
+              {quizItem.question}
+              <i className={clsForIcon.join(" ")} />
+            </li>
+          );
+        })}
       </ul>
-      <p>Правильно 4 из 10</p>
+      <p className="mt-2">
+        Правильно {countSuccessAnswer} из {props.quiz.length}
+      </p>
       <div>
-        <button>Reload</button>
+        <button className="btn btn-info" onClick={props.reload}>
+          Reload
+        </button>
       </div>
     </div>
-  )
-}
+  );
+};
