@@ -1,5 +1,7 @@
 import React from "react";
 import "./finished.css";
+import {Link} from 'react-router-dom'
+import Button from "../Ui/Button/Button";
 
 export default props => {
   const countSuccessAnswer = Object.keys(props.results).reduce((total, key) => {
@@ -34,9 +36,12 @@ export default props => {
         Правильно {countSuccessAnswer} из {props.quiz.length}
       </p>
       <div>
-        <button className="btn btn-info" onClick={props.reload}>
+        <Button type='primary' onClick={props.reload}>
           Reload
-        </button>
+        </Button>
+        <Link to='/'>
+          <Button type='success'>Перейти к списку тестов</Button>
+        </Link>
       </div>
     </div>
   );
