@@ -3,16 +3,15 @@ import "./Input.css";
 
 function isInvalid({valid,touched,shouldValidate}){
     // console.log(!valid && shouldValidate && touched)
-    console.log(valid);
-    console.log(touched);
-    console.log(shouldValidate);
+    // console.log(valid);
+    // console.log(touched);
+    // console.log(shouldValidate);
 
   return !valid && shouldValidate && touched
 }
 
 
 const Input = props => {
-  console.log(props)
   const inputType = props.type || "text";
   const cls = ["Input"];
   const htmlFor = `${inputType} - ${Math.random()}`;

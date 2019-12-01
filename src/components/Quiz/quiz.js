@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import "./quiz.css";
 import Activequiz from "../activeQuiz/activeQuiz.js";
 import Finished from "../finished/finished.jsx";
+import axios from "../../axios/axios-quiz.js";
+import Loader from "../Ui/Loader/Loader.jsx";
 
 class Quiz extends Component {
   state = {
@@ -9,33 +11,29 @@ class Quiz extends Component {
     currentQuiz: 0,
     answerState: null,
     isFinished: false,
-    quiz: [
-      {
-        answers: [
-          { text: "Very well", id: 1 },
-          { text: "So so", id: 2 },
-          { text: "Nice", id: 3 },
-          { text: "Very bad", id: 4 }
-        ],
-        question: "How do you like the weather?",
-        correctAnswerID: 2,
-        id: 1
-      },
-      {
-        answers: [
-          { text: "Bishkek", id: 1 },
-          { text: "Batken", id: 2 },
-          { text: "Osh", id: 3 },
-          { text: "Tokmok", id: 4 }
-        ],
-        question: "Capital of Kyrgyzstan?",
-        correctAnswerID: 1,
-        id: 2
-      }
-    ]
+    quiz: [],
+    loading: true
   };
 
+  async componentDidMount() {
+    try {
+      const response = await axios.get(
+        `/quizes/${this.props.match.params.id}.json`
+      );
+      const quiz = response.data;
+
+      this.setState({
+        quiz,
+        loading: false
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   onAnswerClick = index => {
+    console.log(index);
+    console.log(this.state.currentQuiz)
     if (this.state.answerState) {
       const key = Object.keys(this.state.answerState)[0];
       if (this.state.answerState[key] === "success") {
@@ -46,7 +44,7 @@ class Quiz extends Component {
     const question = this.state.quiz[this.state.currentQuiz];
     const results = this.state.results;
 
-    if (question.correctAnswerID === index) {
+    if (question.rightAnswerID === index) {
       if (!results[question.id]) {
         results[question.id] = "success";
       }
@@ -86,17 +84,24 @@ class Quiz extends Component {
       currentQuiz: 0,
       answerState: null,
       isFinished: false
-    })
-  }
+    });
+  };
 
   render() {
+    console.log(this.state.quiz)
     return (
       <div className="quiz">
         <div className="quiz-wraper">
           <h1>JS Test</h1>
 
-          {this.state.isFinished ? (
-            <Finished results={this.state.results} quiz={this.state.quiz} reload={this.reloadQuestion}/>
+          {this.state.loading ? (
+            <Loader />
+          ) : this.state.isFinished ? (
+            <Finished
+              results={this.state.results}
+              quiz={this.state.quiz}
+              reload={this.reloadQuestion}
+            />
           ) : (
             <Activequiz
               answers={this.state.quiz[this.state.currentQuiz].answers}
