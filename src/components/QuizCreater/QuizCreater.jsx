@@ -1,10 +1,15 @@
 import React, { Component, Fragment } from "react";
 import classes from "./QuizCreater.module.css";
 import Button from "../Ui/Button/Button.js";
-import { createControl, validate , validateForm } from "../../form/FormFramework.js";
+import {
+  createControl,
+  validate,
+  validateForm
+} from "../../form/FormFramework.js";
 import Input from "../Ui/Input/Input.jsx";
 import Select from "../Ui/Select/Select.jsx";
-import axios from 'axios';
+import { connect } from "react-redux";
+import { createQuizQuestion, finishCreateQuiz } from "../../store/actions/create";
 
 function createOptionsControl(number) {
   return createControl(
@@ -32,11 +37,9 @@ function createFormControls() {
     option4: createOptionsControl(4)
   };
 }
-
-export default class QuizCreater extends Component {
+class QuizCreater extends Component {
   state = {
-    quiz: [],
-    isFormValid : false,
+    isFormValid: false,
     formControls: createFormControls(),
     rightAnswerID: 1
   };
@@ -47,55 +50,51 @@ export default class QuizCreater extends Component {
 
   addQuestionHandler = event => {
     event.preventDefault();
-    const quiz = [...this.state.quiz];
-    const index = quiz.length + 1;
-    const {question, option1, option2 , option3 , option4} = this.state.formControls
-
+    const {
+      question,
+      option1,
+      option2,
+      option3,
+      option4
+    } = this.state.formControls;
 
     const questionItem = {
-      question : question.value,
-      id : index,
-      rightAnswerID : this.state.rightAnswerID,
-      answers : [
-        {text : option1.value , id : option1.id},
-        {text : option2.value , id : option2.id},
-        {text : option3.value , id : option3.id},
-        {text : option4.value , id : option4.id},
+      question: question.value,
+      id: this.props.quiz.length + 1,
+      rightAnswerID: this.state.rightAnswerID,
+      answers: [
+        { text: option1.value, id: option1.id },
+        { text: option2.value, id: option2.id },
+        { text: option3.value, id: option3.id },
+        { text: option4.value, id: option4.id }
       ]
+    };
 
-    }
-
-    quiz.push(questionItem);
+    this.props.createQuizQuestion(questionItem);
 
     this.setState({
-      quiz,
+      isFormValid: false,
+      formControls: createFormControls(),
+      rightAnswerID: 1
+    });
+  };
+
+  createQuizHandler = event => {
+    event.preventDefault();
+
+   
+    this.setState({
       isFormValid: false,
       formControls: createFormControls(),
       rightAnswerID: 1
     });
 
-  };
-
-  createQuizHandler = async event => {
-    event.preventDefault();
-
-    try {
-      await axios.post('https://react-quiz-7b92e.firebaseio.com/quizes.json',this.state.quiz);
-      this.setState({
-        quiz : [],
-        isFormValid: false,
-        formControls: createFormControls(),
-        rightAnswerID: 1
-      })
-    } catch (error){
-      console.log(error)
-    }
-    // console.log(this.state.quiz)
+    this.props.finishCreateQuiz();
   };
 
   changeHandler = (value, controlName) => {
-    const formControls = {...this.state.formControls};
-    const control = {...formControls[controlName]};
+    const formControls = { ...this.state.formControls };
+    const control = { ...formControls[controlName] };
 
     control.touched = true;
     control.value = value;
@@ -105,9 +104,8 @@ export default class QuizCreater extends Component {
 
     this.setState({
       formControls,
-      isFormValid : validateForm(formControls)
-    })
-
+      isFormValid: validateForm(formControls)
+    });
   };
 
   renderControls = () => {
@@ -133,9 +131,9 @@ export default class QuizCreater extends Component {
 
   selectChangeHandler = event => {
     this.setState({
-      rightAnswerID : Number(event.target.value)
-    })
-  }
+      rightAnswerID: Number(event.target.value)
+    });
+  };
 
   render() {
     const select = (
@@ -144,10 +142,10 @@ export default class QuizCreater extends Component {
         value={this.state.rightAnswerID}
         onChange={this.selectChangeHandler}
         options={[
-          {text: 1, value : 1},
-          {text: 2, value : 2},
-          {text: 3, value : 3},
-          {text: 4, value : 4},
+          { text: 1, value: 1 },
+          { text: 2, value: 2 },
+          { text: 3, value: 3 },
+          { text: 4, value: 4 }
         ]}
       />
     );
@@ -160,10 +158,18 @@ export default class QuizCreater extends Component {
           <form onSubmit={this.submitHandler}>
             {this.renderControls()}
             {select}
-            <Button type="primary" onClick={this.addQuestionHandler} disabled={!this.state.isFormValid}>
+            <Button
+              type="primary"
+              onClick={this.addQuestionHandler}
+              disabled={!this.state.isFormValid}
+            >
               Добавить вопрос
             </Button>
-            <Button type="success" onClick={this.createQuizHandler} disabled={this.state.quiz.length === 0}>
+            <Button
+              type="success"
+              onClick={this.createQuizHandler}
+              disabled={this.props.quiz.length === 0}
+            >
               Создать тест
             </Button>
           </form>
@@ -172,3 +178,18 @@ export default class QuizCreater extends Component {
     );
   }
 }
+
+function mapStateToProps(state) {
+  return {
+    quiz: state.create.quiz
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    createQuizQuestion: item => dispatch(createQuizQuestion(item)),
+    finishCreateQuiz: () => dispatch(finishCreateQuiz())
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(QuizCreater);

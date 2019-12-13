@@ -2,40 +2,18 @@ import React, { Component } from "react";
 import { NavLink } from "react-router-dom";
 import "./QuizList.css";
 import Loader from "../Ui/Loader/Loader.jsx";
-import axios from "axios";
+import {connect} from 'react-redux'
+import { fetchQuizes } from "../../store/actions/quiz";
 
-export default class QuizList extends Component {
-  state = {
-    quizes: [],
-    pageLoading: true
-  };
+ class QuizList extends Component {
 
-  async componentDidMount() {
-    try {
-      const response = await axios.get(
-        "https://react-quiz-7b92e.firebaseio.com/quizes.json"
-      );
-      const quizes = [];
+   componentDidMount() {
+     this.props.fetchQuizes();
 
-      Object.keys(response.data).forEach((key, index) => {
-        quizes.push({
-          id: key,
-          name: `Тест №${index + 1}`
-        });
-      });
-
-      this.setState({
-        quizes,
-        pageLoading : false
-      });
-
-    } catch (error) {
-      console.log(error);
-    }
   }
 
   rendeQuizes = () => {
-    return this.state.quizes.map(elem => (
+    return this.props.quizes.map(elem => (
       <li key={elem.id}>
         <NavLink to={"/quiz/" + elem.id}>{elem.name}</NavLink>
       </li>
@@ -47,9 +25,26 @@ export default class QuizList extends Component {
       <div className="QuizList">
         <div>
           <h1>Список тестов</h1>
-          {this.state.pageLoading ? <Loader /> : <ul>{this.rendeQuizes()}</ul>}
+          {this.props.pageLoading && this.props.quizes.length !== 0 ? <Loader /> : <ul>{this.rendeQuizes()}</ul>}
         </div>
       </div>
     );
   }
 }
+
+function mapStateToProps(state){
+  return{
+    quizes : state.quiz.quizes,
+    loading : state.quiz.loading
+  }
+
+}
+
+function mapDispatchToProps(dispatch){
+  return{
+    fetchQuizes: () => dispatch(fetchQuizes())
+  }
+
+}
+
+export default connect(mapStateToProps,mapDispatchToProps)(QuizList)
